@@ -1,30 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[41]:
-
-
-if __name__ == "__main__":
-    year = getMakesByYear()
-    make = getCarModelsByMake(year)
-    model = modelSelect()
-    engineData = getEngineByModel(year, make, model)
-    engine = int(engineSelect())
-    
-    print(make, model, engine)
-#     search = search_options(year)
-#     print(search)
-
-
-# In[ ]:
-
-
-
-
-
-# In[17]:
-
-
 import requests
 import json
 import pandas as pd
@@ -41,16 +17,6 @@ headers = {
     "X-RapidAPI-Key": "a128349cd3msha07615f87e1be36p146ca1jsn2b1dce4fe9d3",
     "X-RapidAPI-Host": "car-api2.p.rapidapi.com"
 }
-
-
-# In[ ]:
-
-
-
-
-
-# In[18]:
-
 
 def getMakesByYear():
     year = input("Please enter the year of the car you wish to find: ") or "2020"
@@ -69,16 +35,6 @@ def getMakesByYear():
         print(manufacturer["name"])
     return year
 
-
-# In[ ]:
-
-
-
-
-
-# In[19]:
-
-
 def getCarModelsByMake(year):
     make = input("Please enter the make you wish to find: ") or "Volvo"
     print(f"You selected: {make}")
@@ -96,25 +52,6 @@ def getCarModelsByMake(year):
     except TypeError:
         pass
     return make
-#     for item in data:
-#         print(f"{make}, Model: " + item["name"]) 
-        
-#     try:
-#         for item in model:
-#                 print(item)
-#     except TypeError:
-#         pass
-# getCarModelsByMake("Audi")
-
-
-# In[ ]:
-
-
-
-
-
-# In[37]:
-
 
 def getEngineByModel(year, make, model):
     params = {
@@ -137,47 +74,17 @@ def getEngineByModel(year, make, model):
     for item in gasPower:
         print(item)
 
-
-# In[ ]:
-
-
-
-
-
-# In[30]:
-
-
 def modelSelect():
     model_select = input("Please select a model from the list for more details: ") or "XC90"
     print(f"You selected: {model_select}")
     model = model_select
     return model
 
-
-# In[ ]:
-
-
-
-
-
-# In[31]:
-
-
 def engineSelect():
     engine_select = input("Please select an engine from the list for more details: ") or "2"
     print(f"You selected: {engine_select}")
     engine = engine_select
     return engine
-
-
-# In[ ]:
-
-
-
-
-
-# In[32]:
-
 
 def searchOptions(year):
     search = {}
@@ -187,16 +94,6 @@ def searchOptions(year):
         engine1 = input("Engine: ") or "5.0"
         search = (year, make1, model1, engine1)
     return search
-
-
-# In[ ]:
-
-
-
-
-
-# In[33]:
-
 
 def getEngineByCar(model, search):
     params = {
@@ -209,23 +106,6 @@ def getEngineByCar(model, search):
     car_data = response.json()
     print(model)
     print("| Engine type | Engine Size | Horsepower |")
-#     print(car_data["data"])
-#     for item in car_data:
-#         print(item["description"])
-#     for item in car_data["data"]:
-#         print("| ", item["engine_type"], " | " , item["size"], " | " , item["horsepower_hp"], " | " , item["drive_type"], " | ")
-
-# getEngineByCar("A3")
-
-
-# In[ ]:
-
-
-
-
-
-# In[79]:
-
 
 def getEngineByModel(year, make, model):
     params = {
@@ -241,39 +121,6 @@ def getEngineByModel(year, make, model):
         count += 1
         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
         print(data)
-#         return data
-#         car_info = {
-#             "info": [
-#                 {"engine_type": item["engine_type"],
-#                  "engine_size": item["size"],
-#                  "horse_power": item["horsepower_hp"]}
-#             ]
-#         }
-#     df = pd.DataFrame(car_info["info"])
-#     df = df[["engine_type", "engine_size", "horse_power"]]
-#     print(df)
-#     print(df, "\n")
-    
-# getEngineByModel("MDX")
-
-
-# In[ ]:
-
-
-
-
-
-# In[80]:
-
-
-getEngineByModel(year, make, model)
-
-# for item in getEngineByModel(year, make, model):
-#     print(item)
-
-
-# In[81]:
-
 
 def engineSelect():
     engine_select = input("Please select an engine from the list for more details: ") or "2"
@@ -283,11 +130,10 @@ def engineSelect():
         print(engine)
     return engine
 
-engineSelect()
-
-
-# In[ ]:
-
-
-
-
+if __name__ == "__main__":
+    year = getMakesByYear()
+    make = getCarModelsByMake(year)
+    model = modelSelect()
+    # engineData = getEngineByModel(year, make, model)
+    # engine = int(engineSelect())
+    # print(make, model, engine)
