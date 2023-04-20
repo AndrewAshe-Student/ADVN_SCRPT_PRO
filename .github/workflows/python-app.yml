@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "main", "andrew" ]
+    branches: [ "main"]
   pull_request:
-    branches: [ "main", "andrew" ]
+    branches: [ "main"]
 
 permissions:
   contents: read
@@ -41,7 +41,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest --verbose
+        pytest -v
         pytest Project4.py
         pytest -k "getMakesByYear" Project4.py
         # pytest -k "getMakesByYear()"
