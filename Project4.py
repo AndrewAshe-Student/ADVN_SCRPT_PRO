@@ -133,7 +133,7 @@ def b2():
     return 2
 
 def testForPytest(a2, b2):
-    c = a2 + b2
+    c = (a2 + b2)
     assert c == a2 + b2
 
     # def getEnginesByModel(year, make, model):

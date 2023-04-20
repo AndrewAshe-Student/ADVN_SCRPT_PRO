@@ -43,5 +43,5 @@ jobs:
       run: |
         pytest -v
         pytest Project4.py
-        pytest -k "getMakesByYear" Project4.py
+        pytest -k "getMakesByYear(1, 2)" Project4.py
         # pytest -k "getMakesByYear()"
