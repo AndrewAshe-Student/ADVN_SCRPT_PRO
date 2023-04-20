@@ -15,4 +15,4 @@ def b2():
     return 2
 
 def test_testForPytest():
-    Project4.testForPytest(1, 2)
+    Project4.testForPytest(a2, b2)
