@@ -6,6 +6,7 @@ import json
 import pandas as pd
 import pytest
 import webbrowser as wb
+from pytest import ExitCode
 
 # API
 # https://carapi.app/api#/Models/makemodels%3Aindex%3Aget
