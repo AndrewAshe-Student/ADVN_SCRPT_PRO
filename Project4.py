@@ -123,10 +123,18 @@ def getEnginesByModel(year, make, model):
     except TypeError:
         pass
 
+# PyTest definitions and parameters
+@pytest.fixture
+def a2():
+    return 1
+
+@pytest.fixture
+def b2():
+    return 2
+
 def testForPytest(a2, b2):
     c = a2 + b2
-    if a2 + b2 == c:
-        return "Code Pass"
+    assert c == a2 + b2
 
     # def getEnginesByModel(year, make, model):
     #     params = {
