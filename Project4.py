@@ -123,9 +123,9 @@ def getEnginesByModel(year, make, model):
     except TypeError:
         pass
 
-def testForPytest(a, b):
-    c = a + b
-    if c == (a + b):
+def testForPytest(a2, b2):
+    c = a2 + b2
+    if a2 + b2 == c:
         return "Code Pass"
 
     # def getEnginesByModel(year, make, model):
