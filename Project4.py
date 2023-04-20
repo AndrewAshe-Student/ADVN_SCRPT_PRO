@@ -122,6 +122,11 @@ def getEnginesByModel(year, make, model):
     except TypeError:
         pass
 
+def testForPytest(a, b):
+    c = a + b
+    if c == (a + b):
+        return "Code Pass"
+
     # def getEnginesByModel(year, make, model):
     #     params = {
     #         "year": year,
