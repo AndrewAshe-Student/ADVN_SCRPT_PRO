@@ -28,8 +28,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8
         pip install requests
-        pip install json
-        pip install pandas
+        # pip install json
+        pip install pandas as pd
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
