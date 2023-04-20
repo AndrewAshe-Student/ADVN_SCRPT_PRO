@@ -28,7 +28,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8
         pip install requests
-        pip install json
+        pip install pytest
+        pip install pytest-custom_exit_code
+        # pip install json
         pip install pandas
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
@@ -39,4 +41,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest project4.py
+        pytest test_Project4.py
