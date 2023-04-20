@@ -53,7 +53,67 @@ def getCarModelsByMake(year):
         pass
     return make
 
-def getEngineByModel(year, make, model):
+def modelSelect(year, make):
+    model_select = input("Please select a model from the list for more details: ") or "XC90"
+    print(f"You selected the: {year}, {make}, {model_select}")
+    model = model_select
+    return model
+
+# def engineSelect():
+#     engine_select = input("Please select an engine from the list for more details: ") or "2"
+#     print(f"You selected: {engine_select}")
+#     engine = engine_select
+#     return engine
+
+def engineSelect(engineList):
+    engine_select = input("Please select an engine from the list for more details: ") or "1"
+    print(f"You selected: {engine_select}")
+    for engine in engineList:
+        print(engine)
+    # print(getEngineByModel(year, make, model))
+    # for engine in engineList:
+    #     print(engine)
+    # return engine
+
+# def searchOptions(year):
+#     search = {}
+#     for i in range(1):
+#         make1 = input("Make: ") or "BMW"
+#         model1 = input("Model: ") or "M4"
+#         engine1 = input("Engine: ") or "5.0"
+#         search = {year, make1, model1, engine1}
+#     return search
+
+def getEngineByCar(model, search):
+    params = {
+        "year": "2020",
+        "verbose": "yes",
+        "make": "Audi",
+        "model": model
+    }
+    response = requests.request("GET", engines, headers=headers, params=params)
+    car_data = response.json()
+    print(model)
+    print("| Engine type | Engine Size | Horsepower |")
+
+# def getEnginesByModel(year, make, model):
+#     params = {
+#         "year": year,
+#         "verbose": "yes",
+#         "make": make,
+#         "model": model
+#     }
+#     count = 0
+#     response = requests.request("GET", engines, headers=headers, params=params)
+#     car_data = response.json()
+#     for item in car_data["data"]:
+#         count += 1
+#         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
+#         print(data)
+#     return(data)
+
+
+def getEnginesByModel(year, make, model):
     params = {
         "year": year,
         "verbose": "yes",
@@ -74,66 +134,14 @@ def getEngineByModel(year, make, model):
     for item in gasPower:
         print(item)
 
-def modelSelect():
-    model_select = input("Please select a model from the list for more details: ") or "XC90"
-    print(f"You selected: {model_select}")
-    model = model_select
-    return model
-
-def engineSelect():
-    engine_select = input("Please select an engine from the list for more details: ") or "2"
-    print(f"You selected: {engine_select}")
-    engine = engine_select
-    return engine
-
-def searchOptions(year):
-    search = {}
-    for i in range(1):
-        make1 = input("Make: ") or "BMW"
-        model1 = input("Model: ") or "M4"
-        engine1 = input("Engine: ") or "5.0"
-        search = (year, make1, model1, engine1)
-    return search
-
-def getEngineByCar(model, search):
-    params = {
-        "year": "2020",
-        "verbose": "yes",
-        "make": "Audi",
-        "model": model
-    }
-    response = requests.request("GET", engines, headers=headers, params=params)
-    car_data = response.json()
-    print(model)
-    print("| Engine type | Engine Size | Horsepower |")
-
-def getEngineByModel(year, make, model):
-    params = {
-        "year": year,
-        "verbose": "yes",
-        "make": make,
-        "model": model
-    }
-    count = 0
-    response = requests.request("GET", engines, headers=headers, params=params)
-    car_data = response.json()
-    for item in car_data["data"]:
-        count += 1
-        data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
-        print(data)
-
-def engineSelect():
-    engine_select = input("Please select an engine from the list for more details: ") or "2"
-    print(f"You selected: {engine_select}")
-    engineList = getEngineByModel("2020", "Volvo", "XC90")
-    for engine in engineList():
-        print(engine)
-    return engine
-
 if __name__ == "__main__":
     year = getMakesByYear()
     make = getCarModelsByMake(year)
-    model = modelSelect()
+    model = modelSelect(year, make)
+    engineList = getEnginesByModel(year, make, model)
+    for engine in engineList:
+        print(engine)
+    # engine = engineSelect(engineList)
     # engineData = getEngineByModel(year, make, model)
     # engine = int(engineSelect())
     # print(make, model, engine)
