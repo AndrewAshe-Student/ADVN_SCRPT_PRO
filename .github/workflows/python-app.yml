@@ -42,4 +42,4 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -v
-        pytest -k "test_testForPytest()" Project4.py
+        pytest -k "test_testForPytest" Project4.py
