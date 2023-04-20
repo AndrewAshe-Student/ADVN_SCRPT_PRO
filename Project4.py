@@ -4,6 +4,7 @@
 import requests
 import json
 import pandas as pd
+import webbrowser as wb
 
 # API
 # https://carapi.app/api#/Models/makemodels%3Aindex%3Aget
@@ -67,9 +68,9 @@ def modelSelect(year, make):
 
 def engineSelect(engineList):
     engine_select = input("Please select an engine from the list for more details: ") or "1"
-    print(f"You selected: {engine_select}")
-    for engine in engineList:
-        print(engine)
+    engine_select = int(engine_select)
+    print(f"You selected engine: {engine_select}")
+    return engineList[engine_select - 1]
     # print(getEngineByModel(year, make, model))
     # for engine in engineList:
     #     print(engine)
@@ -96,23 +97,6 @@ def getEngineByCar(model, search):
     print(model)
     print("| Engine type | Engine Size | Horsepower |")
 
-# def getEnginesByModel(year, make, model):
-#     params = {
-#         "year": year,
-#         "verbose": "yes",
-#         "make": make,
-#         "model": model
-#     }
-#     count = 0
-#     response = requests.request("GET", engines, headers=headers, params=params)
-#     car_data = response.json()
-#     for item in car_data["data"]:
-#         count += 1
-#         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
-#         print(data)
-#     return(data)
-
-
 def getEnginesByModel(year, make, model):
     params = {
         "year": year,
@@ -121,27 +105,52 @@ def getEnginesByModel(year, make, model):
         "model": model
     }
     count = 0
-    gasPower = []
+    notGasPower = []
+    allEngines = []
     response = requests.request("GET", engines, headers=headers, params=params)
     car_data = response.json()
     for item in car_data["data"]:
         count += 1
-        data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
-        if data[1] == "gas":
-            gasPower.append(data)
+        data = (count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"])
+        if data[1] != "gas":
+            notGasPower.append(data)
+            allEngines.append(data)
         else:
-            print(data)
-    for item in gasPower:
-        print(item)
+            allEngines.append(data)
+    try:
+        return(allEngines)
+    except TypeError:
+        pass
+
+    # def getEnginesByModel(year, make, model):
+    #     params = {
+    #         "year": year,
+    #         "verbose": "yes",
+    #         "make": make,
+    #         "model": model
+    #     }
+    #     count = 0
+    #     response = requests.request("GET", engines, headers=headers, params=params)
+    #     car_data = response.json()
+    #     for item in car_data["data"]:
+    #         count += 1
+    #         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
+    #         print(data)
+    #     return(data)
 
 if __name__ == "__main__":
     year = getMakesByYear()
     make = getCarModelsByMake(year)
     model = modelSelect(year, make)
     engineList = getEnginesByModel(year, make, model)
+    url = ("https://google.com/search?q=" + year + " " + make + " " + model + "&tbm=isch")
     for engine in engineList:
         print(engine)
-    # engine = engineSelect(engineList)
+    engineSelected = engineSelect(engineList)
+    print(f"{year, make, model, engineSelected}")
+
+    wb.open_new(url)
+   
     # engineData = getEngineByModel(year, make, model)
     # engine = int(engineSelect())
-    # print(make, model, engine) 
+    # print(make, model, engine)
