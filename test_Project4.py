@@ -4,6 +4,6 @@ import Project4
 #     output = Project4.getMakesByYear()
 #     assert output == "2020"
 
-def test_getMakesByYear():
+def test_testForPytest():
     output = Project4.testForPytest(1, 2)
     assert output == "Code Pass"

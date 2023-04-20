@@ -4,6 +4,7 @@
 import requests
 import json
 import pandas as pd
+import pytest
 import webbrowser as wb
 
 # API
