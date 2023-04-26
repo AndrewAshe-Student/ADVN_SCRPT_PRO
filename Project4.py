@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# Imports.
 import requests
 import json
 import pandas as pd
@@ -8,7 +9,7 @@ import pytest
 import webbrowser as wb
 from pytest import ExitCode
 
-# API
+# API.
 # https://carapi.app/api#/Models/makemodels%3Aindex%3Aget
 url = "https://www.carqueryapi.com/api/0.3/"
 auth = "https://car-api2.p.rapidapi.com/api/"
@@ -18,6 +19,7 @@ models = "https://car-api2.p.rapidapi.com/api/models"
 engines = "https://car-api2.p.rapidapi.com/api/engines"
 colours = "https://car-api2.p.rapidapi.com/api/exterior-colors"
 
+    # Header paramaters for api-tokens.
 headers = {
     "X-RapidAPI-Key": "a128349cd3msha07615f87e1be36p146ca1jsn2b1dce4fe9d3",
     "X-RapidAPI-Host": "car-api2.p.rapidapi.com",
@@ -25,13 +27,8 @@ headers = {
     "api-secret": "cb7358847d500853619ac096e80f735d"
 }
 
-# def testApiCall():
-#     params = {}
-#     response = requests.request("GET", auth, headers=headers, params=params)
-#     data = response.json()
-#     data = data["data"]
-#     print(data)
-
+# Function to return {Manufacturers} that released cars
+# in the inputted {year}.
 def getMakesByYear():
     year = input("Please enter the year of the car you wish to find: ") or "2020"
     params = {"year": year}
@@ -44,6 +41,8 @@ def getMakesByYear():
         print(item["name"])
     return year
 
+# Function that takes the inputted {year} and
+# returns {Models} by selected {Manufacturer} in {year}.
 def getCarModelsByMake(year):
     make = input("Please enter the make you wish to find: ") or "Volvo"
     print(f"You selected: {make}")
@@ -62,12 +61,14 @@ def getCarModelsByMake(year):
         pass
     return make
 
-def modelSelect(year, make):
+# Function to select the {Model} of {Manufacturer} in {year}.
+def getModel(year, make):
     model_select = input("Please select a model from the list for more details: ") or "XC90"
     print(f"You selected the: {year}, {make}, {model_select}")
     model = model_select
     return model
 
+# Function to return statistics by {Model} of {Manufacturer} in {year}.
 def getEnginesByModel(year, make, model):
     params = {
         "year": year,
@@ -93,61 +94,35 @@ def getEnginesByModel(year, make, model):
     except TypeError:
         pass
 
+# Function to select the Engine of {Model} by {Manufacturer} in {year}.
 def engineSelect(engineList):
+    for engine in engineList:
+        print(engine)
     engine_select = input("Please select an engine from the list for more details: ") or "1"
     engine_select = int(engine_select)
     print(f"You selected engine: {engine_select}")
     return engineList[engine_select - 1]
-    # print(getEngineByModel(year, make, model))
-    # for engine in engineList:
-    #     print(engine)
-    # return engine
 
-# PyTest definitions and parameters
-# 81 attempts later.
-@pytest.fixture
-def a2():
-    return 1
-
-@pytest.fixture
-def b2():
-    return 2
-
-def testForPytest(a2, b2):
-    c = (a2 + b2)
-    assert c == a2 + b2
-
-    # def getEnginesByModel(year, make, model):
-    #     params = {
-    #         "year": year,
-    #         "verbose": "yes",
-    #         "make": make,
-    #         "model": model
-    #     }
-    #     count = 0
-    #     response = requests.request("GET", engines, headers=headers, params=params)
-    #     car_data = response.json()
-    #     for item in car_data["data"]:
-    #         count += 1
-    #         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
-    #         print(data)
-    #     return(data)
+# Function to generate the url of the search.
+def generateURL(year, make, model):
+    url = ("https://google.com/search?q=" + year + " " + make + " " + model + "&tbm=isch")
+    return url
 
 if __name__ == "__main__":
     # testApiCall()
     year = getMakesByYear()
     make = getCarModelsByMake(year)
-    model = modelSelect(year, make)
+    model = getModel(year, make)
     engineList = getEnginesByModel(year, make, model)
     # exteriorColour = getExteriorColoursByModel(year, make, model)
-    url = ("https://google.com/search?q=" + year + " " + make + " " + model + "&tbm=isch")
-    for engine in engineList:
-        print(engine)
     engineSelected = engineSelect(engineList)
     print(f"{year, make, model, engineSelected}")
 
+    url = generateURL(year, make, model)
     wb.open_new(url)
    
+    input("Press anything to close.")
+
     # engineData = getEngineByModel(year, make, model)
     # engine = int(engineSelect())
     # print(make, model, engine) 
@@ -196,3 +171,41 @@ if __name__ == "__main__":
     #     car_data = response.json()
     #     print(model)
     #     print("| Engine type | Engine Size | Horsepower |")
+
+    # def getEnginesByModel(year, make, model):
+    #     params = {
+    #         "year": year,
+    #         "verbose": "yes",
+    #         "make": make,
+    #         "model": model
+    #     }
+    #     count = 0
+    #     response = requests.request("GET", engines, headers=headers, params=params)
+    #     car_data = response.json()
+    #     for item in car_data["data"]:
+    #         count += 1
+    #         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
+    #         print(data)
+    #     return(data)
+
+    # Test call to confirm Api is responsive.
+    # def testApiCall():
+    #     params = {}
+    #     response = requests.request("GET", auth, headers=headers, params=params)
+    #     data = response.json()
+    #     data = data["data"]
+    #     print(data)
+
+# PyTest definitions and parameters
+# 81 attempts later.
+@pytest.fixture
+def a2():
+    return 1
+
+@pytest.fixture
+def b2():
+    return 2
+
+def testForPytest(a2, b2):
+    c = (a2 + b2)
+    assert c == a2 + b2
