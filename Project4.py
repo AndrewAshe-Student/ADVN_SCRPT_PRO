@@ -3,6 +3,7 @@
 
 # Imports.
 import requests
+import sys
 import json
 import pandas as pd
 import pytest
@@ -11,7 +12,6 @@ from pytest import ExitCode
 
 # API.
 # https://carapi.app/api#/Models/makemodels%3Aindex%3Aget
-url = "https://www.carqueryapi.com/api/0.3/"
 auth = "https://car-api2.p.rapidapi.com/api/"
 makes = "https://car-api2.p.rapidapi.com/api/makes"
 years = "https://car-api2.p.rapidapi.com/api/years"
@@ -19,13 +19,25 @@ models = "https://car-api2.p.rapidapi.com/api/models"
 engines = "https://car-api2.p.rapidapi.com/api/engines"
 colours = "https://car-api2.p.rapidapi.com/api/exterior-colors"
 
-    # Header paramaters for api-tokens.
+# Header paramaters for api-tokens.
 headers = {
     "X-RapidAPI-Key": "a128349cd3msha07615f87e1be36p146ca1jsn2b1dce4fe9d3",
     "X-RapidAPI-Host": "car-api2.p.rapidapi.com",
     "api-token": "c5ce0fd6-f034-4845-9f2b-040c78cb8671",
     "api-secret": "cb7358847d500853619ac096e80f735d"
 }
+
+# Function to test the API endpoint,
+# as to determine if the data is readable or not.
+def testApiEndpoint(url):
+    response = requests.request("GET", makes, headers=headers)
+    if response.status_code == 200:
+        return 1
+    elif response.status_code == 401:
+            print("Unauthorized Request")
+            return 2
+    else:
+        return 2
 
 # Function to return {Manufacturers} that released cars
 # in the inputted {year}.
@@ -108,93 +120,115 @@ def generateURL(year, make, model):
     url = ("https://google.com/search?q=" + year + " " + make + " " + model + "&tbm=isch")
     return url
 
+# Prompt the user for continuation.
+def prompt(url):
+    while True:
+        print("Is this the car you were looking for?")
+        answer = input("[Y/N]: ").upper() or "N"
+        if answer == "Y":
+            wb.open_new(url)
+            print("Would you like to search again?")
+            answerConfOne = input("[Y/N]: ").upper() or "N"
+            if answerConfOne == "Y":
+                break
+            elif answerConfOne == "N":
+                sys.exit()
+        elif answer == "N":
+            print("Would you like to search again?")
+            answerConfTwo = input("[Y/N]: ").upper() or "N"
+            if answerConfTwo == "Y":
+                break
+            elif answerConfTwo == "N":
+                sys.exit()
+
 if __name__ == "__main__":
-    # testApiCall()
-    year = getMakesByYear()
-    make = getCarModelsByMake(year)
-    model = getModel(year, make)
-    engineList = getEnginesByModel(year, make, model)
-    # exteriorColour = getExteriorColoursByModel(year, make, model)
-    engineSelected = engineSelect(engineList)
-    print(f"{year, make, model, engineSelected}")
+    while True:
+        toggle = testApiEndpoint(auth)
+        if toggle == 1:
+            year = getMakesByYear()
+            make = getCarModelsByMake(year)
+            model = getModel(year, make)
+            engineList = getEnginesByModel(year, make, model)
+            # exteriorColour = getExteriorColoursByModel(year, make, model)
+            engineSelected = engineSelect(engineList)
+            print(f"{year, make, model, engineSelected}")
+            url = generateURL(year, make, model)
+            prompt(url)
+        else:
+            sys.exit()
 
-    url = generateURL(year, make, model)
-    wb.open_new(url)
-   
-    input("Press anything to close.")
+        # engineData = getEngineByModel(year, make, model)
+        # engine = int(engineSelect())
+        # print(make, model, engine) 
 
-    # engineData = getEngineByModel(year, make, model)
-    # engine = int(engineSelect())
-    # print(make, model, engine) 
+        # def getExteriorColoursByModel(year, make, model):
+        #     colour = ()
+        #     params = {
+        #         "year": year,
+        #         "make": make,
+        #         "model": model
+        #     }
+        #     response = requests.request("GET", colours, headers=headers, params=params)
+        #     #Response 200, successful query
+        #     car_data = response.json()
+        #     data = car_data["data"]
+        #     try:
+        #         for item in data:
+        #             print(f"{year}, {make}, {model}: " + item["name"])
+        #     except TypeError:
+        #         pass
+        #     return colour
 
-    # def getExteriorColoursByModel(year, make, model):
-    #     colour = ()
-    #     params = {
-    #         "year": year,
-    #         "make": make,
-    #         "model": model
-    #     }
-    #     response = requests.request("GET", colours, headers=headers, params=params)
-    #     #Response 200, successful query
-    #     car_data = response.json()
-    #     data = car_data["data"]
-    #     try:
-    #         for item in data:
-    #             print(f"{year}, {make}, {model}: " + item["name"])
-    #     except TypeError:
-    #         pass
-    #     return colour
+        # def engineSelect():
+        #     engine_select = input("Please select an engine from the list for more details: ") or "2"
+        #     print(f"You selected: {engine_select}")
+        #     engine = engine_select
+        #     return engine
 
-    # def engineSelect():
-    #     engine_select = input("Please select an engine from the list for more details: ") or "2"
-    #     print(f"You selected: {engine_select}")
-    #     engine = engine_select
-    #     return engine
+        # def searchOptions(year):
+        #     search = {}
+        #     for i in range(1):
+        #         make1 = input("Make: ") or "BMW"
+        #         model1 = input("Model: ") or "M4"
+        #         engine1 = input("Engine: ") or "5.0"
+        #         search = {year, make1, model1, engine1}
+        #     return search
 
-    # def searchOptions(year):
-    #     search = {}
-    #     for i in range(1):
-    #         make1 = input("Make: ") or "BMW"
-    #         model1 = input("Model: ") or "M4"
-    #         engine1 = input("Engine: ") or "5.0"
-    #         search = {year, make1, model1, engine1}
-    #     return search
+        #    def getEngineByCar(model, search):
+        #     params = {
+        #         "year": "2020",
+        #         "verbose": "yes",
+        #         "make": "Audi",
+        #         "model": model
+        #     }
+        #     response = requests.request("GET", engines, headers=headers, params=params)
+        #     car_data = response.json()
+        #     print(model)
+        #     print("| Engine type | Engine Size | Horsepower |")
 
-    #    def getEngineByCar(model, search):
-    #     params = {
-    #         "year": "2020",
-    #         "verbose": "yes",
-    #         "make": "Audi",
-    #         "model": model
-    #     }
-    #     response = requests.request("GET", engines, headers=headers, params=params)
-    #     car_data = response.json()
-    #     print(model)
-    #     print("| Engine type | Engine Size | Horsepower |")
+        # def getEnginesByModel(year, make, model):
+        #     params = {
+        #         "year": year,
+        #         "verbose": "yes",
+        #         "make": make,
+        #         "model": model
+        #     }
+        #     count = 0
+        #     response = requests.request("GET", engines, headers=headers, params=params)
+        #     car_data = response.json()
+        #     for item in car_data["data"]:
+        #         count += 1
+        #         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
+        #         print(data)
+        #     return(data)
 
-    # def getEnginesByModel(year, make, model):
-    #     params = {
-    #         "year": year,
-    #         "verbose": "yes",
-    #         "make": make,
-    #         "model": model
-    #     }
-    #     count = 0
-    #     response = requests.request("GET", engines, headers=headers, params=params)
-    #     car_data = response.json()
-    #     for item in car_data["data"]:
-    #         count += 1
-    #         data = [count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"]]
-    #         print(data)
-    #     return(data)
-
-    # Test call to confirm Api is responsive.
-    # def testApiCall():
-    #     params = {}
-    #     response = requests.request("GET", auth, headers=headers, params=params)
-    #     data = response.json()
-    #     data = data["data"]
-    #     print(data)
+        # Test call to confirm Api is responsive.
+        # def testApiCall():
+        #     params = {}
+        #     response = requests.request("GET", auth, headers=headers, params=params)
+        #     data = response.json()
+        #     data = data["data"]
+        #     print(data)
 
 # PyTest definitions and parameters
 # 81 attempts later.
