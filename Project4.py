@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 import webbrowser as wb
 from pytest import ExitCode
+import time
 
 # API.
 # https://carapi.app/api#/Models/makemodels%3Aindex%3Aget
@@ -18,6 +19,9 @@ years = "https://car-api2.p.rapidapi.com/api/years"
 models = "https://car-api2.p.rapidapi.com/api/models"
 engines = "https://car-api2.p.rapidapi.com/api/engines"
 colours = "https://car-api2.p.rapidapi.com/api/exterior-colors"
+carAttributes = "https://car-api2.p.rapidapi.com/api/vehicle-attributes"
+
+df = pd.DataFrame()
 
 # Header paramaters for api-tokens.
 headers = {
@@ -34,7 +38,10 @@ def testApiEndpoint(url):
     if response.status_code == 200:
         return 1
     elif response.status_code == 401:
-            print("Unauthorized Request")
+            print("Unauthorized Request.")
+            return 2
+    elif response.status_code == 11001:
+            print("Network Connection Error.")
             return 2
     else:
         return 2
@@ -95,8 +102,10 @@ def getEnginesByModel(year, make, model):
     car_data = response.json()
     for item in car_data["data"]:
         count += 1
-        data = (count, item["engine_type"], item["size"], item["horsepower_hp"], item["drive_type"])
-        if data[1] != "gas":
+        data = (item["engine_type"], item["fuel_type"], item["size"], item["cylinders"],
+                item["horsepower_hp"], item["horsepower_rpm"], item["torque_ft_lbs"], item["torque_rpm"],
+                item["valves"], item["valve_timing"],item["cam_type"], item["drive_type"], item["transmission"])
+        if data[0] != "gas":
             notGasPower.append(data)
             allEngines.append(data)
         else:
@@ -108,37 +117,106 @@ def getEnginesByModel(year, make, model):
 
 # Function to select the Engine of {Model} by {Manufacturer} in {year}.
 def engineSelect(engineList):
-    for engine in engineList:
-        print(engine)
-    engine_select = input("Please select an engine from the list for more details: ") or "1"
-    engine_select = int(engine_select)
+    for idx, engine in enumerate(engineList, start=1):
+        print(idx, engine)
+    engine_select = int(input("Please select an engine from the list for more details: ")) or int(1)
     print(f"You selected engine: {engine_select}")
     return engineList[engine_select - 1]
 
+# Function to select the Engine of {Model} by {Manufacturer} in {year}.
+# Ask the user if that is the correct choice.
+def engineSelect2(engineList):
+    for idx, engine in enumerate(engineList, start=1):
+        print(idx, engine)
+    while True:
+        engine_select = int(input("Please select an engine from the list for more details: ")) or int(1)
+        print(f"You selected engine: {engine_select}")
+        decision = input("Is this your selection? ").upper
+        if decision == "N":
+            pass
+        elif decision == "Y":
+            return engineList[engine_select - 1]
+        
+# Function to select the Engine of {Model} by {Manufacturer} in {year}.
+# Ask the user if that is the correct choice.
+def engineSelect3(engineList):
+    # for idx, engine in enumerate(engineList, start=1):
+    #     print(idx, engine)
+    engine_select = int(input("Please select an engine from the list: ") or 1)
+    decision = input(f"You selected engine: {engine_select} \n Is this your selection? [Y/N]: ").upper() or "Y"
+    if decision == "Y":
+        return engine_select
+    else:
+        return engineSelect3(engineList)
+
+def getTransmissionByModel(year, make, model):
+    params = {
+        "year": year,
+        "verbose": "yes",
+        "make": make,
+        "model": model
+    }
+    count = 0
+    response = requests.request("GET", engines, headers=headers, params=params)
+    car_data = response.json()
+    # print(car_data)
+    # 'https://carapi.app/api/interior-colors?year=2008&make=audi&model=a4'
+    # 'https://carapi.app/api/vehicle-attributes?attribute=engines.transmission'
+
+# Generate pandas data frame
+def generateDataFrame(year, make, model):
+    params = {
+        "year": year,
+        "verbose": "yes",
+        "make": make,
+        "model": model
+    }
+    count = 0
+    rows = pd.DataFrame()
+    response = requests.request("GET", engines, headers=headers, params=params)
+    car_data = response.json()
+    for item in car_data["data"]:
+        count += 1
+        metrics = (item["engine_type"], item["fuel_type"], item["size"], item["cylinders"],
+                item["horsepower_hp"], item["horsepower_rpm"], item["torque_ft_lbs"], item["torque_rpm"],
+                item["valves"], item["valve_timing"], item["cam_type"], item["drive_type"], item["transmission"])
+        
+        (
+        pdEngine, pdFuel, pdSize, pdCylinders, pdHp, pdHpRpm,
+        pdTorque, pdTorqueRpm, pdValves, pdValveTiming,
+        pdCamType, pdDriveType, pdTransmission
+        ) = metrics
+    
+        row = {'count': count, 'engine_type': pdEngine, 'fuel_type': pdFuel, 'size': pdSize,
+            'cylinders': pdCylinders, 'horsepower_hp': pdHp, 'horsepower_rpm': pdHpRpm,
+                'torque_ft_lbs': pdTorque, 'torque_rpm':pdTorqueRpm, 'valves':pdValves, 'valve_timing': pdValveTiming,
+                'cam_type': pdCamType , 'drive_type': pdDriveType, 'transmission_type': pdTransmission}
+        rows = rows._append(row, ignore_index=True)
+    return rows 
+
 # Function to generate the url of the search.
 def generateURL(year, make, model):
-    url = ("https://google.com/search?q=" + year + " " + make + " " + model + "&tbm=isch")
+    url = ("https://google.com/search?q=" + year + " " + make + " " + model + " " + "&tbm=isch")
     return url
 
 # Prompt the user for continuation.
 def prompt(url):
     while True:
-        print("Is this the car you were looking for?")
-        answer = input("[Y/N]: ").upper() or "N"
+        answer = input("Is this the car you were looking for? [Y/N]: ").upper() or "N"
         if answer == "Y":
             wb.open_new(url)
-            print("Would you like to search again?")
-            answerConfOne = input("[Y/N]: ").upper() or "N"
+            answerConfOne = input("Would you like to search again? [Y/N]: ").upper() or "N"
             if answerConfOne == "Y":
                 break
             elif answerConfOne == "N":
                 sys.exit()
         elif answer == "N":
-            print("Would you like to search again?")
-            answerConfTwo = input("[Y/N]: ").upper() or "N"
+            answerConfTwo = input("Would you like to search again? [Y/N]: ").upper() or "N"
             if answerConfTwo == "Y":
                 break
             elif answerConfTwo == "N":
+                print("Thank you for using this application!" + "\n" + "Now closing.")
+                time.sleep(3)
                 sys.exit()
 
 if __name__ == "__main__":
@@ -149,12 +227,21 @@ if __name__ == "__main__":
             make = getCarModelsByMake(year)
             model = getModel(year, make)
             engineList = getEnginesByModel(year, make, model)
+            # getTransmissionByModel(year, make, model)
             # exteriorColour = getExteriorColoursByModel(year, make, model)
-            engineSelected = engineSelect(engineList)
+            
+            rows = generateDataFrame(year, make, model)
+            df = df._append(rows, ignore_index=True)
+            print(df.to_string())
+            
+            engineSelected = engineSelect3(engineList)
             print(f"{year, make, model, engineSelected}")
+
             url = generateURL(year, make, model)
             prompt(url)
         else:
+            print("Thank you for using this application!" + "\n" + "Now closing.")
+            time.sleep(3)
             sys.exit()
 
         # engineData = getEngineByModel(year, make, model)
